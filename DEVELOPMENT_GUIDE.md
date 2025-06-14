@@ -51,6 +51,21 @@ npm run start
 ### Shared (`/shared`)
 - **schema.ts**: Shared TypeScript types and schemas
 
+## User Experience Flow
+
+### Step-by-Step User Journey
+1. **Landing Page** - Users see the homepage with clear call-to-action buttons
+2. **Authentication** - Users can sign in or register with step indicators
+3. **Onboarding Tour** - New users get a guided tour of features
+4. **Personalized Dashboard** - Users see welcome message and quick actions
+5. **Shopping Experience** - Browse, add to cart, wishlist, and checkout
+6. **Order Management** - Track orders and manage profile
+
+### Authentication States
+- **Unauthenticated**: Landing page with login/register options
+- **First-time User**: Onboarding tour after registration
+- **Returning User**: Personalized dashboard with quick actions
+
 ## Development Workflow
 
 ### 1. Adding New Features

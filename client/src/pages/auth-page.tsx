@@ -96,11 +96,35 @@ export default function AuthPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Medallion Mart
+            🏆 Welcome to Medallion Mart
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             Your premium shopping destination
           </p>
+          
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                1
+              </div>
+              <span className="ml-2 text-sm text-gray-600">Sign In/Register</span>
+            </div>
+            <div className="w-8 h-px bg-gray-300"></div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold">
+                2
+              </div>
+              <span className="ml-2 text-sm text-gray-500">Browse Products</span>
+            </div>
+            <div className="w-8 h-px bg-gray-300"></div>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold">
+                3
+              </div>
+              <span className="ml-2 text-sm text-gray-500">Start Shopping</span>
+            </div>
+          </div>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
