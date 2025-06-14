@@ -7,7 +7,11 @@ export default {
     extend: {
       fontFamily: {
         'cursive': ['Dancing Script', 'cursive'],
-        'sans': ['Dancing Script', 'cursive'],
+        'elegant': ['Playfair Display', 'serif'],
+        'modern': ['Poppins', 'sans-serif'],
+        'fancy': ['Great Vibes', 'cursive'],
+        'script': ['Sacramento', 'cursive'],
+        'sans': ['Poppins', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Great+Vibes&family=Sacramento&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -164,15 +164,35 @@ html {
   
   body {
     @apply bg-slate-900 text-slate-200;
-    font-family: 'Dancing Script', cursive;
-    font-weight: 500;
+    font-family: 'Poppins', 'Dancing Script', sans-serif;
+    font-weight: 400;
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
     min-height: 100vh;
+    letter-spacing: 0.025em;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Dancing Script', cursive;
+  h1 {
+    font-family: 'Great Vibes', 'Dancing Script', cursive;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', 'Dancing Script', serif;
     font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  h3, h4 {
+    font-family: 'Sacramento', 'Dancing Script', cursive;
+    font-weight: 400;
+    letter-spacing: 0.025em;
+  }
+
+  h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
   }
 
   /* Smooth scrolling */
@@ -252,9 +272,10 @@ html {
     background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
     border: none;
     color: #f8fafc;
-    font-family: 'Dancing Script', cursive;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-family: 'Poppins', 'Dancing Script', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.025em;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
   }
@@ -349,6 +370,27 @@ html {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Font utility classes */
+  .font-elegant {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .font-modern {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-fancy {
+    font-family: 'Great Vibes', cursive;
+  }
+
+  .font-script {
+    font-family: 'Sacramento', cursive;
+  }
+
+  .font-cursive {
+    font-family: 'Dancing Script', cursive;
+  }
 }
 
 /* Print styles */
@@ -391,15 +433,17 @@ html {
 
 /* Navigation styles */
 .nav-link {
-  font-family: 'Dancing Script', cursive;
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-family: 'Sacramento', 'Dancing Script', cursive;
+  font-weight: 400;
+  font-size: 1.2rem;
+  letter-spacing: 0.025em;
   transition: all 0.3s ease;
 }
 
 .nav-link:hover {
   color: #a855f7;
   text-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
+  transform: scale(1.05);
 }
 
 /* Input styles */
@@ -407,8 +451,9 @@ html {
   background: rgba(30, 41, 59, 0.8);
   border: 1px solid rgba(139, 92, 246, 0.3);
   color: #e2e8f0;
-  font-family: 'Dancing Script', cursive;
-  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.025em;
 }
 
 .custom-input:focus {
@@ -419,16 +464,29 @@ html {
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   body {
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3, h4 {
+    font-size: 1.5rem;
   }
   
   .btn-gradient {
-    font-size: 1rem;
+    font-size: 0.95rem;
     padding: 0.75rem 1.5rem;
   }
   
   .nav-link {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 
