@@ -148,12 +148,12 @@ export default function Header() {
           </div>
 
           {/* Header Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
             {/* Mobile Search Button */}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="md:hidden p-2 text-gray-600 hover:text-orange-500"
+              className="md:hidden p-2 text-gray-600 hover:text-orange-500 min-w-[44px] min-h-[44px]"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Search className="h-5 w-5" />
