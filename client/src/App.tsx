@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +7,6 @@ import { queryClient } from "@/lib/queryClient";
 import { useStore } from "@/lib/store";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import OnboardingTour from "@/components/onboarding-tour";
 
 import NotFound from "@/pages/not-found";
@@ -117,6 +117,11 @@ function AuthenticatedApp() {
 }
 
 function App() {
+  // Set dark mode by default
+  React.useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
