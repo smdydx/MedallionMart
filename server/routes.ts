@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProductSchema, insertCartItemSchema, insertWishlistItemSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertUserSchema } from "@shared/schema";
-import { setupAuth, isAuthenticated, isAdmin } from "./auth";
+import { setupAuth, isAuthenticated, isAdmin, hashPassword, verifyPassword } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -17,16 +17,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "All fields are required" });
       }
 
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Validate password strength
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists with this email" });
       }
 
+      // Hash password before storing
+      const hashedPassword = hashPassword(password);
+
       const userData = {
-        email,
-        password,
-        firstName,
-        lastName,
+        email: email.toLowerCase().trim(),
+        password: hashedPassword,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         role: "user"
       };
 
@@ -38,13 +52,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser(result.data);
 
       // Set session
-      (req.session as any).user = {
-        id: parseInt(user.id),
+      const sessionUser = {
+        id: parseInt(user.id.toString()),
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role
       };
+
+      (req.session as any).user = sessionUser;
 
       // Save session explicitly
       req.session.save((err) => {
@@ -55,13 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.status(201).json({ 
           message: "Account created successfully", 
-          user: { 
-            id: user.id, 
-            email: user.email, 
-            firstName: user.firstName, 
-            lastName: user.lastName, 
-            role: user.role 
-          } 
+          user: sessionUser
         });
       });
     } catch (error) {
@@ -78,23 +88,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password required" });
       }
 
-      const user = await storage.getUserByEmail(email);
+      const user = await storage.getUserByEmail(email.toLowerCase().trim());
       if (!user) {
-        return res.status(401).json({ message: "User not found" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      if (user.password !== password) {
-        return res.status(401).json({ message: "Invalid password" });
+      // Verify password
+      if (!verifyPassword(password, user.password)) {
+        return res.status(401).json({ message: "Invalid credentials" });
       }
 
       // Set session
-      (req.session as any).user = {
-        id: parseInt(user.id),
+      const sessionUser = {
+        id: parseInt(user.id.toString()),
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role
       };
+
+      (req.session as any).user = sessionUser;
 
       // Save session explicitly
       req.session.save((err) => {
@@ -103,15 +116,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Session save failed" });
         }
         
+        // Migrate guest cart to user cart if exists
+        const guestCart = (req.session as any)?.guestCart;
+        if (guestCart && guestCart.length > 0) {
+          try {
+            for (const item of guestCart) {
+              await storage.addToCart({
+                productId: item.productId,
+                quantity: item.quantity,
+                userId: sessionUser.id.toString()
+              });
+            }
+            // Clear guest cart after migration
+            (req.session as any).guestCart = [];
+          } catch (migrateError) {
+            console.error("Cart migration error:", migrateError);
+          }
+        }
+
         res.json({ 
           message: "Login successful", 
-          user: { 
-            id: user.id, 
-            email: user.email, 
-            firstName: user.firstName, 
-            lastName: user.lastName, 
-            role: user.role 
-          } 
+          user: sessionUser
         });
       });
     } catch (error) {
@@ -235,44 +260,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cart (authenticated users only)
-  app.get("/api/cart", isAuthenticated, async (req, res) => {
+  // Cart (with guest support)
+  app.get("/api/cart", async (req, res) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
+      if (req.user?.id) {
+        // Authenticated user - get from database
+        const cartItems = await storage.getCartItems(parseInt(req.user.id.toString()));
+        res.json(cartItems);
+      } else {
+        // Guest user - return empty cart or session cart
+        const guestCart = (req.session as any)?.guestCart || [];
+        res.json(guestCart);
       }
-      const cartItems = await storage.getCartItems(parseInt(userId.toString()));
-      res.json(cartItems);
     } catch (error) {
+      console.error("Cart fetch error:", error);
       res.status(500).json({ message: "Failed to fetch cart items" });
     }
   });
 
-  app.post("/api/cart", isAuthenticated, async (req, res) => {
+  app.post("/api/cart", async (req, res) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
       const { productId, quantity = 1 } = req.body;
 
       if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
       }
 
-      const data = insertCartItemSchema.parse({ 
-        productId: parseInt(productId), 
-        quantity: parseInt(quantity), 
-        userId: userId.toString()
-      });
+      if (req.user?.id) {
+        // Authenticated user - save to database
+        const data = insertCartItemSchema.parse({ 
+          productId: parseInt(productId), 
+          quantity: parseInt(quantity), 
+          userId: req.user.id.toString()
+        });
 
-      const cartItem = await storage.addToCart(data);
-      res.json(cartItem);
+        const cartItem = await storage.addToCart(data);
+        res.json(cartItem);
+      } else {
+        // Guest user - save to session
+        if (!req.session) {
+          return res.status(500).json({ message: "Session not available" });
+        }
+
+        const product = await storage.getProduct(parseInt(productId));
+        if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+        }
+
+        let guestCart = (req.session as any).guestCart || [];
+        
+        // Check if product already exists in cart
+        const existingItemIndex = guestCart.findIndex((item: any) => item.productId === parseInt(productId));
+        
+        if (existingItemIndex >= 0) {
+          // Update quantity
+          guestCart[existingItemIndex].quantity += parseInt(quantity);
+        } else {
+          // Add new item
+          const newItem = {
+            id: Date.now(), // Temporary ID for guest cart
+            productId: parseInt(productId),
+            quantity: parseInt(quantity),
+            product: product
+          };
+          guestCart.push(newItem);
+        }
+
+        (req.session as any).guestCart = guestCart;
+        
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ message: "Failed to save cart" });
+          }
+          res.json({ message: "Item added to cart", cart: guestCart });
+        });
+      }
     } catch (error) {
       console.error("Add to cart error:", error);
-      res.status(400).json({ message: "Invalid cart item data" });
+      res.status(500).json({ message: "Failed to add item to cart" });
     }
   });
 
