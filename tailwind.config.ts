@@ -6,12 +6,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'cursive': ['Dancing Script', 'cursive'],
-        'elegant': ['Playfair Display', 'serif'],
-        'modern': ['Poppins', 'sans-serif'],
-        'fancy': ['Great Vibes', 'cursive'],
-        'script': ['Sacramento', 'cursive'],
-        'sans': ['Poppins', 'sans-serif'],
+        'cursive': ['EB Garamond', 'Times New Roman', 'serif'],
+        'elegant': ['Cinzel', 'Times New Roman', 'serif'],
+        'modern': ['EB Garamond', 'Times New Roman', 'serif'],
+        'fancy': ['Cormorant Garamond', 'Times New Roman', 'serif'],
+        'script': ['Libre Baskerville', 'Times New Roman', 'serif'],
+        'sans': ['EB Garamond', 'Times New Roman', 'serif'],
+        'serif': ['EB Garamond', 'Times New Roman', 'serif'],
+        'roman': ['Cinzel', 'Times New Roman', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
