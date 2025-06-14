@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./simple-storage";
+import { storage } from "./storage";
 import { insertProductSchema, insertCartItemSchema, insertWishlistItemSchema, insertOrderSchema, insertOrderItemSchema, insertCategorySchema, insertUserSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated, isAdmin } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
-  setupAuth(app);
+  await setupAuth(app);
 
   // Auth routes
   app.post('/api/register', async (req, res) => {
