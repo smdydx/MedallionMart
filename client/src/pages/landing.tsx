@@ -81,9 +81,7 @@ export default function Landing() {
 
       {/* Main Content */}
       <div className="pt-14 sm:pt-16">
-        <div className="mt-4 sm:mt-6">
         <HeroSection />
-      </div>
         <CategoriesSection />
         <FeaturedProductsSection />
         <FlashDealsSection />
