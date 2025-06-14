@@ -5,22 +5,46 @@ import { ShoppingCart, Truck, Shield, Star, Clock, Users } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Large floating shapes */}
+        <div className="absolute -top-20 -left-20 w-40 h-40 lg:w-80 lg:h-80 bg-gradient-to-br from-orange-200 to-pink-200 rounded-full opacity-30 animate-pulse"></div>
+        <div className="absolute top-1/4 -right-20 w-32 h-32 lg:w-64 lg:h-64 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full opacity-30 animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-24 h-24 lg:w-48 lg:h-48 bg-gradient-to-br from-green-200 to-teal-200 rounded-full opacity-30 animate-ping"></div>
+        
+        {/* Floating particles */}
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          >
+            <div className="w-2 h-2 lg:w-4 lg:h-4 bg-orange-300 rounded-full opacity-40"></div>
+          </div>
+        ))}
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Welcome to <span className="text-orange-600">Medallion Mart</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 min-h-screen flex items-center">
+          <div className="text-center relative z-10">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 lg:mb-8 leading-tight">
+              Welcome to <span className="text-orange-600 animate-pulse">Medallion Mart</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-8 lg:mb-12 max-w-4xl mx-auto leading-relaxed">
               Experience premium shopping with lightning-fast delivery. From electronics to everyday essentials, 
               we bring the best products right to your doorstep.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center max-w-lg mx-auto">
               <Button 
                 size="lg" 
-                className="bg-orange-600 hover:bg-orange-700 px-8 py-3 text-lg"
+                className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 px-6 lg:px-8 py-3 lg:py-4 text-base lg:text-lg font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
                 onClick={() => window.location.href = '/auth'}
               >
                 Get Started - Sign In
@@ -28,7 +52,7 @@ export default function Landing() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="px-8 py-3 text-lg border-orange-600 text-orange-600 hover:bg-orange-50"
+                className="w-full sm:w-auto px-6 lg:px-8 py-3 lg:py-4 text-base lg:text-lg font-bold border-orange-600 text-orange-600 hover:bg-orange-50 transition-all duration-300 transform hover:scale-105"
                 onClick={() => window.location.href = '/auth'}
               >
                 Browse Products
