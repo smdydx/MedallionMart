@@ -109,6 +109,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       (req.session as any).user = sessionUser;
 
+      // Migrate guest cart to user cart if exists
+      const guestCart = (req.session as any)?.guestCart;
+      if (guestCart && guestCart.length > 0) {
+        try {
+          for (const item of guestCart) {
+            await storage.addToCart({
+              productId: item.productId,
+              quantity: item.quantity,
+              userId: sessionUser.id.toString()
+            });
+          }
+          // Clear guest cart after migration
+          (req.session as any).guestCart = [];
+        } catch (migrateError) {
+          console.error("Cart migration error:", migrateError);
+        }
+      }
+
       // Save session explicitly
       req.session.save((err) => {
         if (err) {
@@ -116,24 +134,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Session save failed" });
         }
         
-        // Migrate guest cart to user cart if exists
-        const guestCart = (req.session as any)?.guestCart;
-        if (guestCart && guestCart.length > 0) {
-          try {
-            for (const item of guestCart) {
-              await storage.addToCart({
-                productId: item.productId,
-                quantity: item.quantity,
-                userId: sessionUser.id.toString()
-              });
-            }
-            // Clear guest cart after migration
-            (req.session as any).guestCart = [];
-          } catch (migrateError) {
-            console.error("Cart migration error:", migrateError);
-          }
-        }
-
         res.json({ 
           message: "Login successful", 
           user: sessionUser
