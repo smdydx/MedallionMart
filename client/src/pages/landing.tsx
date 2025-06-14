@@ -7,7 +7,7 @@ import TestimonialsSection from "@/components/testimonials-section";
 import DeliveryPromiseSection from "@/components/delivery-promise-section";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "wouter";
 
 export default function Landing() {
   return (
