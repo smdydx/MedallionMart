@@ -1,12 +1,10 @@
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Play, Star, Users, Award, Truck } from "lucide-react";
+import { ChevronRight, Star, Users, Award, Truck } from "lucide-react";
 import { Link } from "wouter";
 
 export default function HeroSection() {
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const stats = [
     { icon: Users, label: "Happy Customers", value: "50K+" },
@@ -91,15 +89,16 @@ export default function HeroSection() {
                 </Button>
               </Link>
               
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="text-lg px-8 py-4 border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
-                onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-              >
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
-              </Button>
+              <Link href="/products">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-8 py-4 border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                >
+                  <Star className="mr-2 w-5 h-5" />
+                  Shop Now
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -141,46 +140,18 @@ export default function HeroSection() {
           >
             <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm border border-white/20">
               <div className="aspect-video relative">
-                {!isVideoPlaying ? (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 flex items-center justify-center">
-                    <motion.div 
-                      className="text-center text-white"
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <Play className="w-16 h-16 mx-auto mb-4 opacity-80" />
-                      <p className="text-lg font-medium">Experience Medallion Mart</p>
-                      <p className="text-sm opacity-80">Click to watch our story</p>
-                    </motion.div>
-                  </div>
-                ) : (
-                  <video 
-                    className="w-full h-full object-cover"
-                    autoPlay 
-                    muted 
-                    loop
-                    onEnded={() => setIsVideoPlaying(false)}
-                  >
-                    <source src="/src/assets/mall.mp4" type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                )}
-              </div>
-              
-              {/* Play button overlay */}
-              {!isVideoPlaying && (
-                <motion.button
-                  className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors duration-300"
-                  onClick={() => setIsVideoPlaying(true)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <video 
+                  className="w-full h-full object-cover"
+                  autoPlay 
+                  muted 
+                  loop
+                  playsInline
                 >
-                  <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-xl">
-                    <Play className="w-8 h-8 text-gray-800 ml-1" />
-                  </div>
-                </motion.button>
-              )}
+                  <source src="/src/assets/mall.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
             </div>
 
             {/* Floating Cards */}

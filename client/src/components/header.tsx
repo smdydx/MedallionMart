@@ -1,16 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Heart, ShoppingCart, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useStore } from "@/lib/store";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  ShoppingCart, 
+  Heart, 
+  Menu, 
+  Search, 
+  User,
+  Home,
+  Package,
+  ShoppingBag,
+  LogOut,
+  Settings,
+  Moon,
+  Sun
+} from "lucide-react";
 
 export default function Header() {
+  const [location] = useLocation();
+  const { cartCount, wishlistCount, setCartOpen } = useStore();
+  const { user, isAuthenticated } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const { toast } = useToast();
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/logout", {
+        method: "POST",
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully",
+      });
+      window.location.href = "/";
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to logout",
+        variant: "destructive",
+      });
+    },
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useLocation();
-  const { cartCount, wishlistCount, isMobileMenuOpen, setMobileMenuOpen } = useStore();
+  const { isMobileMenuOpen, setMobileMenuOpen } = useStore();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +71,27 @@ export default function Header() {
     { href: "/products?flashDeal=true", label: "Deals" },
     { href: "/orders", label: "Track Order" },
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    // Check initial theme
+    setIsDark(document.documentElement.classList.contains('dark'));
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleTheme = () => {
+    document.documentElement.classList.toggle('dark');
+    setIsDark(!isDark);
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
@@ -134,16 +201,79 @@ export default function Header() {
               </motion.div>
             </Link>
 
-            {/* Profile */}
-            <motion.div
-              className="relative hidden sm:block"
-              whileHover={{ scale: 1.05 }}
-            >
-              <Button variant="ghost" className="flex items-center space-x-2 p-2 text-gray-600 hover:text-indigo-500">
-                <User className="h-5 w-5 lg:h-6 lg:w-6" />
-                <span className="hidden lg:block font-medium">John</span>
+            {/* Auth Section */}
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="p-2"
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
-            </motion.div>
+
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.firstName} ${user?.lastName}`} />
+                        <AvatarFallback>
+                          {user?.firstName?.[0]}{user?.lastName?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{user?.firstName} {user?.lastName}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/orders" className="flex items-center">
+                        <Package className="mr-2 h-4 w-4" />
+                        Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    {user?.role === 'admin' && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                      className="flex items-center"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/auth">
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                </Link>
+              )}
+            </div>
 
             {/* Mobile Menu Button */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>

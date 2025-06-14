@@ -18,6 +18,7 @@ import Orders from "@/pages/orders";
 import AdminDashboard from "@/pages/admin";
 import Landing from "@/pages/landing";
 import AuthPage from "@/pages/auth-page";
+import ProfilePage from "@/pages/profile";
 
 import Header from "@/components/header";
 import FloatingCart from "@/components/floating-cart";
@@ -91,6 +92,7 @@ function AuthenticatedApp() {
           <Route path="/cart" component={Cart} />
           <Route path="/checkout" component={Checkout} />
           <Route path="/orders" component={Orders} />
+          <Route path="/profile" component={ProfilePage} />
           <Route path="/admin" component={AdminDashboard} />
           <Route component={NotFound} />
         </Switch>

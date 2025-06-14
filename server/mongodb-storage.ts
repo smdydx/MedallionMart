@@ -357,7 +357,103 @@ export class MongoStorage implements IStorage {
         tags: ["resistance", "bands", "fitness"],
         deliveryTime: "Express",
         inStock: true
-      }
+      },
+      {
+            name: "Smart Watch",
+            description: "Advanced smartwatch with health monitoring",
+            price: "8999",
+            originalPrice: "12999",
+            image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop",
+            categoryId: categoryIds[0],
+            featured: true,
+            flashDeal: true,
+            discountPercentage: 30,
+            tags: ["smart", "health", "fitness"],
+            deliveryTime: "Same Day",
+            inStock: true,
+            rating: "4.7",
+            reviewCount: 256
+          },
+          {
+            name: "Gaming Mouse",
+            description: "High-precision gaming mouse with RGB lighting",
+            price: "1999",
+            originalPrice: "2999",
+            image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop",
+            categoryId: categoryIds[0],
+            featured: false,
+            flashDeal: true,
+            discountPercentage: 33,
+            tags: ["gaming", "rgb", "precision"],
+            deliveryTime: "Express",
+            inStock: true,
+            rating: "4.4",
+            reviewCount: 167
+          },
+          {
+            name: "Cotton T-Shirt",
+            description: "Premium cotton t-shirt for everyday wear",
+            price: "799",
+            originalPrice: "1299",
+            image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
+            categoryId: categoryIds[1],
+            featured: false,
+            flashDeal: false,
+            discountPercentage: 0,
+            tags: ["cotton", "casual", "comfort"],
+            deliveryTime: "Standard",
+            inStock: true,
+            rating: "4.3",
+            reviewCount: 92
+          },
+          {
+            name: "Running Shoes",
+            description: "Lightweight running shoes for athletes",
+            price: "3499",
+            originalPrice: "4999",
+            image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop",
+            categoryId: categoryIds[3],
+            featured: true,
+            flashDeal: false,
+            discountPercentage: 30,
+            tags: ["running", "sports", "lightweight"],
+            deliveryTime: "Express",
+            inStock: true,
+            rating: "4.6",
+            reviewCount: 203
+          },
+          {
+            name: "Coffee Maker",
+            description: "Automatic coffee maker with multiple brewing options",
+            price: "5999",
+            originalPrice: "8999",
+            image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop",
+            categoryId: categoryIds[2],
+            featured: false,
+            flashDeal: true,
+            discountPercentage: 33,
+            tags: ["coffee", "automatic", "kitchen"],
+            deliveryTime: "Standard",
+            inStock: true,
+            rating: "4.5",
+            reviewCount: 156
+          },
+          {
+            name: "LED Desk Lamp",
+            description: "Adjustable LED desk lamp with touch control",
+            price: "1499",
+            originalPrice: "2299",
+            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
+            categoryId: categoryIds[2],
+            featured: false,
+            flashDeal: false,
+            discountPercentage: 0,
+            tags: ["led", "adjustable", "office"],
+            deliveryTime: "Express",
+            inStock: true,
+            rating: "4.2",
+            reviewCount: 78
+          }
     ];
 
     await this.db.collection('products').insertMany(productsData);
@@ -460,14 +556,14 @@ export class MongoStorage implements IStorage {
   async getCartItems(userId: number): Promise<(CartItem & { product: Product })[]> {
     const cartItems = await this.db.collection('cart_items').find({ userId }).toArray();
     const result = [];
-    
+
     for (const item of cartItems) {
       const product = await this.getProduct(item.productId);
       if (product) {
         result.push({ ...item, id: item._id.toString(), product });
       }
     }
-    
+
     return result as any;
   }
 
@@ -515,14 +611,14 @@ export class MongoStorage implements IStorage {
   async getWishlistItems(userId: number): Promise<(WishlistItem & { product: Product })[]> {
     const wishlistItems = await this.db.collection('wishlist_items').find({ userId }).toArray();
     const result = [];
-    
+
     for (const item of wishlistItems) {
       const product = await this.getProduct(item.productId);
       if (product) {
         result.push({ ...item, id: item._id.toString(), product });
       }
     }
-    
+
     return result as any;
   }
 
