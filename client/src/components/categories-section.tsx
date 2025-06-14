@@ -44,6 +44,18 @@ export default function CategoriesSection() {
     );
   }
 
+  const getCategoryColor = (categoryColor: string) => {
+    switch (categoryColor) {
+      case 'red': return '#F56565';
+      case 'blue': return '#4299E1';
+      case 'green': return '#48BB78';
+      case 'yellow': return '#ECC94B';
+      case 'purple': return '#805AD5';
+      case 'pink': return '#ED64A6';
+      default: return '#6B46C1';
+    }
+  };
+
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,35 +69,46 @@ export default function CategoriesSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Shop by Category</h2>
           <p className="text-xl text-gray-600">Discover amazing deals across all categories</p>
         </motion.div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {categories?.map((category, index) => {
-            const IconComponent = iconMap[category.icon as keyof typeof iconMap] || Smartphone;
-            const colorClass = colorMap[category.color as keyof typeof colorMap] || colorMap.red;
-            
-            return (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link href={`/products?categoryId=${category.id}`}>
-                  <div className={`bg-gradient-to-br ${colorClass} p-6 rounded-2xl text-center cursor-pointer transition-all duration-300 hover:shadow-lg`}>
-                    <div className="w-16 h-16 bg-white bg-opacity-80 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="h-8 w-8" />
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {categories?.map((category: any, index: number) => {
+              const getIcon = (categoryName: string) => {
+                switch(categoryName.toLowerCase()) {
+                  case 'electronics': return '📱';
+                  case 'fashion': return '👕';
+                  case 'home': return '🏠';
+                  case 'sports': return '⚽';
+                  case 'books': return '📚';
+                  case 'grocery': return '🍎';
+                  default: return '🛍️';
+                }
+              };
+
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link href={`/products?categoryId=${category.id}`}>
+                    <div className="group bg-white rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2">
+                      <div 
+                        className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-3xl shadow-lg"
+                        style={{ backgroundColor: getCategoryColor(category.color) }}
+                      >
+                        {getIcon(category.name)}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">{category.description}</p>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{category.name}</h3>
-                    <p className="text-sm text-gray-600">50k+ items</p>
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
       </div>
     </section>
   );

@@ -1,166 +1,231 @@
+
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
+import { Search, ShoppingBag, Truck, Shield, Star, Play, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Truck } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 
 export default function HeroSection() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    const video = document.getElementById('hero-video') as HTMLVideoElement;
+    if (video) {
+      video.addEventListener('loadeddata', () => setIsVideoLoaded(true));
+    }
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
+    }
+  };
+
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('featured-products');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="relative text-white overflow-hidden -mt-16 pt-16 md:-mt-20 md:pt-20">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Video Background */}
-      <video 
-        className="absolute inset-0 w-full h-full object-cover"
-        autoPlay 
-        loop 
-        muted 
-        playsInline
-      >
-        <source src="/src/assets/mall.mp4" type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-      
-      {/* Enhanced Background pattern with dynamic geometric shapes */}
-      <div className="absolute inset-0 opacity-20">
-        {/* Floating circles with different animations */}
-        <motion.div 
-          className="absolute top-10 left-5 w-20 h-20 lg:w-32 lg:h-32 bg-gradient-to-br from-yellow-300 to-orange-500 rounded-full blur-sm"
-          animate={{ 
-            y: [-20, 30, -20], 
-            x: [-10, 10, -10],
-            rotate: [0, 180, 360]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute top-32 right-10 w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg rotate-45 blur-sm"
-          animate={{ 
-            y: [-15, 25, -15], 
-            rotate: [45, 225, 405],
-            scale: [1, 1.3, 1]
-          }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-32 left-1/4 w-12 h-12 lg:w-20 lg:h-20 bg-gradient-to-br from-green-400 to-teal-500 rounded-full blur-sm"
-          animate={{ 
-            scale: [1, 1.5, 1], 
-            opacity: [0.5, 1, 0.5],
-            y: [-10, 20, -10]
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute top-1/2 right-1/4 w-14 h-14 lg:w-28 lg:h-28 bg-gradient-to-br from-pink-400 to-red-500 rounded-full blur-sm"
-          animate={{ 
-            x: [-20, 20, -20], 
-            y: [-15, 15, -15],
-            scale: [0.8, 1.2, 0.8]
-          }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-10 right-5 w-18 h-18 lg:w-36 lg:h-36 bg-gradient-to-br from-indigo-400 to-blue-600 rounded-lg rotate-12 blur-sm"
-          animate={{ 
-            rotate: [12, 192, 372], 
-            scale: [1, 0.7, 1],
-            y: [-25, 15, -25]
-          }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        {/* Additional smaller floating elements */}
-        {Array.from({ length: 6 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className={`absolute w-4 h-4 lg:w-8 lg:h-8 bg-white rounded-full blur-sm opacity-60`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [-20, 20, -20],
-              x: [-10, 10, -10],
-              opacity: [0.3, 0.8, 0.3],
-              scale: [0.5, 1, 0.5]
-            }}
-            transition={{
-              duration: 3 + Math.random() * 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: Math.random() * 2
-            }}
-          />
-        ))}
+      <div className="absolute inset-0 z-0">
+        <video
+          id="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          onLoadedData={() => setIsVideoLoaded(true)}
+        >
+          <source src="/src/assets/mall.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 video-overlay"></div>
       </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 lg:py-40 min-h-screen flex items-center">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
-          <motion.div 
-            className="text-center lg:text-left order-2 lg:order-1"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 lg:mb-8 leading-tight">
-              Shop <span className="text-yellow-300 animate-pulse">Everything</span><br/>
-              Get <span className="text-green-300 animate-bounce">Delivered Fast</span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl mb-6 lg:mb-8 text-gray-100 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              From groceries to gadgets, fashion to food - discover millions of products with lightning-fast delivery
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center lg:justify-start mb-8 lg:mb-12">
-              <Link href="/products">
-                <Button className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl font-bold text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-                  <ShoppingBag className="mr-2 h-4 w-4 lg:h-5 lg:w-5" />
-                  Start Shopping
-                </Button>
-              </Link>
-              <Link href="/orders">
-                <Button variant="outline" className="w-full sm:w-auto bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg border border-white border-opacity-30 text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl font-bold text-base lg:text-lg transition-all duration-300 hover:bg-opacity-30">
-                  <Truck className="mr-2 h-4 w-4 lg:h-5 lg:w-5" />
-                  Track Order
-                </Button>
-              </Link>
-            </div>
-            
-            {/* Quick Stats */}
-            <motion.div 
-              className="grid grid-cols-3 gap-4 lg:gap-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+
+      {/* Floating Elements */}
+      <div className="absolute inset-0 z-10">
+        <motion.div
+          className="absolute top-20 left-10 text-white/20"
+          animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
+          transition={{ duration: 6, repeat: Infinity }}
+        >
+          <ShoppingBag size={60} />
+        </motion.div>
+        <motion.div
+          className="absolute top-40 right-20 text-white/20"
+          animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+          transition={{ duration: 8, repeat: Infinity }}
+        >
+          <Truck size={50} />
+        </motion.div>
+        <motion.div
+          className="absolute bottom-40 left-20 text-white/20"
+          animate={{ y: [0, -15, 0], rotate: [0, 15, 0] }}
+          transition={{ duration: 7, repeat: Infinity }}
+        >
+          <Shield size={40} />
+        </motion.div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="space-y-8"
+        >
+          {/* Main Heading */}
+          <div className="space-y-4">
+            <motion.h1
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.7 }}
             >
-              <div className="text-center">
-                <div className="text-xl lg:text-3xl font-bold text-yellow-300 animate-pulse">1M+</div>
-                <div className="text-xs lg:text-sm text-gray-200">Products</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl lg:text-3xl font-bold text-green-300 animate-pulse">10min</div>
-                <div className="text-xs lg:text-sm text-gray-200">Avg Delivery</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl lg:text-3xl font-bold text-blue-300 animate-pulse">500K+</div>
-                <div className="text-xs lg:text-sm text-gray-200">Happy Users</div>
-              </div>
-            </motion.div>
-          </motion.div>
-          
-          <motion.div 
-            className="relative order-1 lg:order-2 mb-8 lg:mb-0"
-            initial={{ opacity: 0, scale: 0.8, x: 50 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+              Medallion
+              <span className="block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Mart
+              </span>
+            </motion.h1>
+            
+            <motion.p
+              className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1 }}
+            >
+              Your premium shopping destination with exclusive deals, 
+              lightning-fast delivery, and unmatched quality
+            </motion.p>
+          </div>
+
+          {/* Search Bar */}
+          <motion.div
+            className="max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.2 }}
           >
-            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-                alt="Modern e-commerce shopping experience" 
-                className="w-full h-64 sm:h-80 lg:h-96 object-cover transform hover:scale-110 transition-transform duration-700" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <form onSubmit={handleSearch} className="relative">
+              <div className="relative group">
+                <Input
+                  type="text"
+                  placeholder="Search for products, brands, categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full py-6 px-6 pr-16 text-lg rounded-full border-0 bg-white/95 backdrop-blur-sm shadow-2xl focus:ring-4 focus:ring-white/30 transition-all duration-300 group-hover:bg-white"
+                />
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="absolute right-2 top-2 bottom-2 px-6 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.4 }}
+          >
+            <Link href="/products">
+              <Button
+                size="lg"
+                className="px-8 py-4 text-lg rounded-full bg-white text-indigo-600 hover:bg-gray-100 hover:scale-105 transition-all duration-300 shadow-xl font-semibold"
+              >
+                <ShoppingBag className="mr-2 h-5 w-5" />
+                Shop Now
+              </Button>
+            </Link>
+            
+            <Link href="/products?flashDeal=true">
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-8 py-4 text-lg rounded-full border-2 border-white text-white hover:bg-white hover:text-indigo-600 hover:scale-105 transition-all duration-300 shadow-xl font-semibold"
+              >
+                ⚡ Flash Deals
+              </Button>
+            </Link>
+          </motion.div>
+
+          {/* Trust Indicators */}
+          <motion.div
+            className="flex flex-wrap justify-center items-center gap-8 text-white/80 pt-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.6 }}
+          >
+            <div className="flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              <span className="text-sm font-medium">Free Delivery</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              <span className="text-sm font-medium">Secure Payment</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 fill-current text-yellow-400" />
+              <span className="text-sm font-medium">4.8+ Rating</span>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          onClick={scrollToProducts}
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-white/60 hover:text-white transition-colors"
+          >
+            <ChevronDown className="h-8 w-8" />
+          </motion.div>
+        </motion.div>
       </div>
-    </section>
+
+      {/* Performance Metrics Overlay */}
+      <motion.div
+        className="absolute bottom-20 right-8 bg-white/10 backdrop-blur-sm rounded-lg p-4 text-white hidden lg:block"
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, delay: 2.2 }}
+      >
+        <div className="text-center space-y-2">
+          <div className="text-2xl font-bold">10K+</div>
+          <div className="text-sm opacity-80">Happy Customers</div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="absolute bottom-20 left-8 bg-white/10 backdrop-blur-sm rounded-lg p-4 text-white hidden lg:block"
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, delay: 2.4 }}
+      >
+        <div className="text-center space-y-2">
+          <div className="text-2xl font-bold">5K+</div>
+          <div className="text-sm opacity-80">Products</div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
