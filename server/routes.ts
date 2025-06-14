@@ -1,3 +1,4 @@
+
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -109,29 +110,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       (req.session as any).user = sessionUser;
 
-      // Migrate guest cart to user cart if exists
-      const guestCart = (req.session as any)?.guestCart;
-      if (guestCart && guestCart.length > 0) {
-        try {
-          for (const item of guestCart) {
-            await storage.addToCart({
-              productId: item.productId,
-              quantity: item.quantity,
-              userId: sessionUser.id.toString()
-            });
-          }
-          // Clear guest cart after migration
-          (req.session as any).guestCart = [];
-        } catch (migrateError) {
-          console.error("Cart migration error:", migrateError);
-        }
-      }
-
-      // Save session and send response
+      // First save the session, then handle cart migration
       req.session.save((err) => {
         if (err) {
           console.error("Session save error:", err);
           return res.status(500).json({ message: "Session save failed" });
+        }
+        
+        // Handle cart migration in background (don't await)
+        const guestCart = (req.session as any)?.guestCart;
+        if (guestCart && guestCart.length > 0) {
+          // Migrate cart items asynchronously
+          Promise.all(guestCart.map((item: any) => 
+            storage.addToCart({
+              productId: item.productId,
+              quantity: item.quantity,
+              userId: sessionUser.id.toString()
+            })
+          )).then(() => {
+            // Clear guest cart after migration
+            (req.session as any).guestCart = [];
+            req.session.save(() => {});
+          }).catch(error => {
+            console.error("Cart migration error:", error);
+          });
         }
         
         res.json({ 
@@ -189,6 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Profile update failed" });
     }
   });
+  
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {
