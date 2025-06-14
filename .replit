@@ -22,3 +22,20 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Full Development Pipeline"
+author = 43828700
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run check"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
