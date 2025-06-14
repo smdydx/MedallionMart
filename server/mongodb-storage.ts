@@ -460,20 +460,35 @@ export class MongoStorage implements IStorage {
 
     await this.db.collection('products').insertMany(productsData);
 
-    // Create a demo user
-    const demoUser = {
-      username: "demo",
-      email: "demo@medallionmart.com",
-      password: "demo123",
-      firstName: "John",
-      lastName: "Doe",
-      phone: "+91 9876543210",
-      address: "123 Demo Street",
-      city: "Mumbai",
-      pincode: "400001"
-    };
+    // Create demo users
+    const demoUsers = [
+      {
+        username: "demo",
+        email: "demo@medallionmart.com",
+        password: "demo123",
+        firstName: "John",
+        lastName: "Doe",
+        phone: "+91 9876543210",
+        address: "123 Demo Street",
+        city: "Mumbai",
+        pincode: "400001",
+        role: "user"
+      },
+      {
+        username: "admin",
+        email: "admin@medallionmart.com",
+        password: "admin123",
+        firstName: "Admin",
+        lastName: "User",
+        phone: "+91 9876543211",
+        address: "Admin Office",
+        city: "Mumbai",
+        pincode: "400001",
+        role: "admin"
+      }
+    ];
 
-    await this.db.collection('users').insertOne(demoUser);
+    await this.db.collection('users').insertMany(demoUsers);
   }
 
   // User methods
@@ -488,23 +503,23 @@ export class MongoStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const user = await this.db.collection('users').findOne({ email });
-    return user ? { ...user, id: parseInt(user._id.toString().slice(-8), 16) } as any : undefined;
+    return user ? { ...user, id: user._id.toString() } as any : undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await this.db.collection('users').insertOne(insertUser);
-    return { ...insertUser, id: parseInt(result.insertedId.toString().slice(-8), 16) } as any;
+    return { ...insertUser, id: result.insertedId.toString() } as any;
   }
 
   // Category methods
   async getCategories(): Promise<Category[]> {
     const categories = await this.db.collection('categories').find({}).toArray();
-    return categories.map(cat => ({ ...cat, id: parseInt(cat._id.toString().slice(-8), 16) })) as any;
+    return categories.map(cat => ({ ...cat, id: cat._id.toString() })) as any;
   }
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const result = await this.db.collection('categories').insertOne(insertCategory);
-    return { ...insertCategory, id: parseInt(result.insertedId.toString().slice(-8), 16) } as any;
+    return { ...insertCategory, id: result.insertedId.toString() } as any;
   }
 
   // Product methods

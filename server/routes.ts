@@ -174,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const cartItems = await storage.getCartItems(userId);
+      const cartItems = await storage.getCartItems(parseInt(userId.toString()));
       res.json(cartItems);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch cart items" });
@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertCartItemSchema.parse({ 
         productId: parseInt(productId), 
         quantity: parseInt(quantity), 
-        userId: userId 
+        userId: userId.toString() 
       });
       
       const cartItem = await storage.addToCart(data);
@@ -250,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      await storage.clearCart(parseInt(userId));
+      await storage.clearCart(parseInt(userId.toString()));
       res.json({ message: "Cart cleared" });
     } catch (error) {
       res.status(500).json({ message: "Failed to clear cart" });
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const wishlistItems = await storage.getWishlistItems(userId);
+      const wishlistItems = await storage.getWishlistItems(parseInt(userId.toString()));
       res.json(wishlistItems);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch wishlist items" });
@@ -277,7 +277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const data = insertWishlistItemSchema.parse({ ...req.body, userId: parseInt(userId) });
+      const data = insertWishlistItemSchema.parse({ ...req.body, userId: userId.toString() });
       const wishlistItem = await storage.addToWishlist(data);
       res.json(wishlistItem);
     } catch (error) {
@@ -307,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const orders = await storage.getOrders(userId);
+      const orders = await storage.getOrders(parseInt(userId.toString()));
       res.json(orders);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch orders" });
@@ -337,16 +337,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const { orderData, items } = req.body;
       
-      const orderInsert = insertOrderSchema.parse({ ...orderData, userId: parseInt(userId) });
+      const orderInsert = insertOrderSchema.parse({ ...orderData, userId: userId.toString() });
       const orderItems = items.map((item: any) => insertOrderItemSchema.parse(item));
       
       const order = await storage.createOrder(orderInsert, orderItems);
       
       // Clear cart after successful order
-      await storage.clearCart(parseInt(userId));
+      await storage.clearCart(parseInt(userId.toString()));
       
       res.json(order);
     } catch (error) {
+      console.error("Create order error:", error);
       res.status(400).json({ message: "Invalid order data" });
     }
   });
@@ -369,6 +370,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(order);
     } catch (error) {
       res.status(500).json({ message: "Failed to update order status" });
+    }
+  });
+
+  // Payment processing endpoint
+  app.post("/api/payments/process", isAuthenticated, async (req, res) => {
+    try {
+      const { amount, paymentMethod, orderId } = req.body;
+      
+      if (!amount || !paymentMethod) {
+        return res.status(400).json({ message: "Amount and payment method are required" });
+      }
+      
+      // Simulate payment processing
+      const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      
+      // In a real app, you would integrate with actual payment gateways like Razorpay, Stripe, etc.
+      const paymentResult = {
+        transactionId,
+        status: "success",
+        amount,
+        paymentMethod,
+        timestamp: new Date().toISOString()
+      };
+      
+      res.json(paymentResult);
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      res.status(500).json({ message: "Payment processing failed" });
     }
   });
 
