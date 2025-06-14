@@ -60,6 +60,14 @@ export default function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please login to search products",
+        variant: "destructive",
+      });
+      return;
+    }
     if (searchQuery.trim()) {
       setLocation(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
@@ -131,10 +139,11 @@ export default function Header() {
             <form onSubmit={handleSearch} className="relative w-full">
               <Input
                 type="text"
-                placeholder="Search products..."
+                placeholder={isAuthenticated ? "Search products..." : "Login to search"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                disabled={!isAuthenticated}
+                className={`w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm ${!isAuthenticated ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
               <Button
                 type="submit"
@@ -292,10 +301,11 @@ export default function Header() {
                   <form onSubmit={handleSearch} className="relative w-full mt-4 mb-6">
                     <Input
                       type="text"
-                      placeholder="Search products..."
+                      placeholder={isAuthenticated ? "Search products..." : "Login to search"}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-4 pr-12 py-3"
+                      disabled={!isAuthenticated}
+                      className={`w-full pl-4 pr-12 py-3 ${!isAuthenticated ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                     <Button
                       type="submit"

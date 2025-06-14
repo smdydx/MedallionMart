@@ -19,13 +19,21 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
   const { addToCart, isInWishlist, addToWishlist, removeFromWishlist, wishlistItems } = useStore();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+  const { isAuthenticated } = useAuth();
+
   const inWishlist = isInWishlist(product.id);
   const wishlistItem = wishlistItems.find(item => item.productId === product.id);
 
   const addToCartMutation = useMutation({
-    mutationFn: (data: { productId: number; quantity: number }) =>
-      apiRequest('POST', '/api/cart', data),
+    mutationFn: async () => {
+      if (!isAuthenticated) {
+        throw new Error("Please login to add items to cart");
+      }
+      return await apiRequest("/api/cart", "POST", {
+        productId: product.id,
+        quantity: 1,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cart'] });
       toast({
@@ -70,7 +78,16 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
     e.preventDefault();
     e.stopPropagation();
     setIsLoading(true);
-    
+
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add items to cart",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await addToCartMutation.mutateAsync({
         productId: product.id,
@@ -84,7 +101,7 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (inWishlist && wishlistItem) {
       await removeFromWishlistMutation.mutateAsync(wishlistItem.id);
     } else {
@@ -131,7 +148,7 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
             />
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
           </div>
-          
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {showDiscount && product.discountPercentage > 0 && (
@@ -166,7 +183,7 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
           <h3 className="font-semibold text-gray-900 mb-2 text-lg line-clamp-2">
             {product.name}
           </h3>
-          
+
           {product.description && (
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
               {product.description}
