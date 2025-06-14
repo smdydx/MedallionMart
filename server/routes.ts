@@ -136,6 +136,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(401).json({ message: "Not authenticated" });
     }
   });
+
+  app.put('/api/user', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { firstName, lastName, email } = req.body;
+      
+      // Update user in storage (you'll need to implement this method)
+      const updatedUser = await storage.updateUser(parseInt(userId.toString()), {
+        firstName,
+        lastName,
+        email
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ message: "Profile update failed" });
+    }
+  });
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {

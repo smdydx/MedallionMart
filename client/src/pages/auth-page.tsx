@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,7 @@ export default function AuthPage() {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -37,15 +36,15 @@ export default function AuthPage() {
 
     try {
       const response = await apiRequest("POST", "/api/login", { email, password });
-      
+
       if (response.ok) {
         const result = await response.json();
-        
+
         toast({
           title: "Welcome back! 🎉",
           description: "Successfully logged in",
         });
-        
+
         // Reload the page to update authentication state
         setTimeout(() => {
           window.location.href = "/products";
@@ -68,7 +67,7 @@ export default function AuthPage() {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -102,15 +101,15 @@ export default function AuthPage() {
         firstName,
         lastName
       });
-      
+
       if (response.ok) {
         const result = await response.json();
-        
+
         toast({
           title: "Welcome to Medallion Mart! 🎉",
           description: "Account created successfully",
         });
-        
+
         // Reload the page to update authentication state
         setTimeout(() => {
           window.location.href = "/products";
@@ -146,7 +145,7 @@ export default function AuthPage() {
           <p className="text-slate-300 text-lg mb-6">
             Your premium shopping destination
           </p>
-          
+
           {/* Step Indicator */}
           <div className="flex items-center justify-center space-x-2 mb-8">
             <div className="flex items-center">
@@ -181,7 +180,7 @@ export default function AuthPage() {
               Register
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="login">
             <Card className="bg-slate-800 border-slate-700 shadow-2xl">
               <CardHeader className="text-center">
@@ -231,7 +230,7 @@ export default function AuthPage() {
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
-                
+
                 {/* Demo Credentials */}
                 <div className="mt-6 p-4 bg-slate-700 rounded-lg border border-slate-600">
                   <p className="text-sm text-slate-300 font-medium mb-2">Demo Credentials:</p>
@@ -241,7 +240,7 @@ export default function AuthPage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="register">
             <Card className="bg-slate-800 border-slate-700 shadow-2xl">
               <CardHeader className="text-center">

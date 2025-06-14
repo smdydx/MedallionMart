@@ -54,18 +54,7 @@ export default function AdminDashboard() {
   // Mutations
   const createProductMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/admin/products", {
-        method: "POST",
-        body: JSON.stringify({
-          ...data,
-          price: data.price.toString(),
-          originalPrice: data.originalPrice || null,
-          categoryId: parseInt(data.categoryId),
-          tags: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [],
-          reviewCount: 0,
-          rating: "0"
-        }),
-      });
+      return await apiRequest("/api/admin/products", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -99,10 +88,7 @@ export default function AdminDashboard() {
 
   const createCategoryMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/admin/categories", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return await apiRequest("/api/admin/categories", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -180,7 +166,7 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
@@ -367,7 +353,7 @@ export default function AdminDashboard() {
                             placeholder="Brief description"
                           />
                         </div>
-                      </div>
+                                            </div>
                       <Button type="submit" disabled={createCategoryMutation.isPending}>
                         {createCategoryMutation.isPending ? "Creating..." : "Create Category"}
                       </Button>
