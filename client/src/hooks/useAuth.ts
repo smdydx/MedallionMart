@@ -11,6 +11,8 @@ export function useAuth() {
   return {
     user,
     isAuthenticated: !!user && !error,
+    isAdmin: user?.role === 'admin',
     isLoading,
+    error,
   };
 }

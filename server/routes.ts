@@ -11,14 +11,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/register', async (req, res) => {
     try {
-      const result = insertUserSchema.safeParse(req.body);
-      if (!result.success) {
-        return res.status(400).json({ message: "Invalid user data", errors: result.error.issues });
+      const { email, password, firstName, lastName } = req.body;
+
+      if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({ message: "All fields are required" });
       }
 
-      const existingUser = await storage.getUserByEmail(result.data.email || "");
+      const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+        return res.status(400).json({ message: "User already exists with this email" });
+      }
+
+      const userData = {
+        email,
+        password,
+        firstName,
+        lastName,
+        role: "user"
+      };
+
+      const result = insertUserSchema.safeParse(userData);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid user data", errors: result.error.issues });
       }
 
       const user = await storage.createUser(result.data);
@@ -32,7 +46,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
 
-      res.status(201).json({ message: "User created successfully", user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role } });
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        
+        res.status(201).json({ 
+          message: "Account created successfully", 
+          user: { 
+            id: user.id, 
+            email: user.email, 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+            role: user.role 
+          } 
+        });
+      });
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
@@ -48,8 +79,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) {
-        return res.status(401).json({ message: "Invalid credentials" });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      if (user.password !== password) {
+        return res.status(401).json({ message: "Invalid password" });
       }
 
       // Set session
@@ -61,7 +96,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role
       };
 
-      res.json({ message: "Login successful", user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role } });
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        
+        res.json({ 
+          message: "Login successful", 
+          user: { 
+            id: user.id, 
+            email: user.email, 
+            firstName: user.firstName, 
+            lastName: user.lastName, 
+            role: user.role 
+          } 
+        });
+      });
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });

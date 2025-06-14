@@ -20,12 +20,15 @@ declare global {
 export function setupAuth(app: Express) {
   // Session configuration
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'medallion-mart-secret-key',
+    secret: process.env.SESSION_SECRET || 'medallion-mart-secret-key-super-secure-random-string',
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Reset expiration on activity
     cookie: {
       secure: false, // Set to true in production with HTTPS
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      httpOnly: true, // Prevent XSS attacks
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax' // CSRF protection
     }
   }));
 
