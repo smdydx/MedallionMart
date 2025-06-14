@@ -8,17 +8,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   await setupAuth(app);
 
-  // Logout route
-  app.post('/api/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Failed to logout' });
-      }
-      res.clearCookie('connect.sid');
-      res.json({ message: 'Logged out successfully' });
-    });
-  });
-
   // Auth routes
   app.post('/api/register', async (req, res) => {
     try {
@@ -197,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertCartItemSchema.parse({ 
         productId: parseInt(productId), 
         quantity: parseInt(quantity), 
-        userId: parseInt(userId.toString())
+        userId: userId.toString()
       });
 
       const cartItem = await storage.addToCart(data);
@@ -277,10 +266,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const data = insertWishlistItemSchema.parse({ ...req.body, userId: userId.toString() });
+      const data = insertWishlistItemSchema.parse({ 
+        ...req.body, 
+        userId: parseInt(userId.toString())
+      });
       const wishlistItem = await storage.addToWishlist(data);
       res.json(wishlistItem);
     } catch (error) {
+      console.error("Add to wishlist error:", error);
       res.status(400).json({ message: "Invalid wishlist item data" });
     }
   });
@@ -337,7 +330,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const { orderData, items } = req.body;
 
-      const orderInsert = insertOrderSchema.parse({ ...orderData, userId: userId.toString() });
+      const orderInsert = insertOrderSchema.parse({ 
+        ...orderData, 
+        userId: parseInt(userId.toString())
+      });
       const orderItems = items.map((item: any) => insertOrderItemSchema.parse(item));
 
       const order = await storage.createOrder(orderInsert, orderItems);
