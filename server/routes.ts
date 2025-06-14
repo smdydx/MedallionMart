@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.createUser(result.data);
-      
+
       // Set session
       (req.session as any).user = {
         id: parseInt(user.id),
@@ -53,7 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/login', async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       if (!email || !password) {
         return res.status(400).json({ message: "Email and password required" });
       }
@@ -125,11 +125,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const product = await storage.getProduct(id);
-      
+
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
-      
+
       res.json(product);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch product" });
@@ -143,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!result.success) {
         return res.status(400).json({ message: "Invalid product data", errors: result.error.issues });
       }
-      
+
       const product = await storage.createProduct(result.data);
       res.status(201).json(product);
     } catch (error) {
@@ -158,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!result.success) {
         return res.status(400).json({ message: "Invalid category data", errors: result.error.issues });
       }
-      
+
       const category = await storage.createCategory(result.data);
       res.status(201).json(category);
     } catch (error) {
@@ -187,19 +187,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       const { productId, quantity = 1 } = req.body;
-      
+
       if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
       }
-      
+
       const data = insertCartItemSchema.parse({ 
         productId: parseInt(productId), 
         quantity: parseInt(quantity), 
-        userId: userId.toString() 
+        userId: String(userId) 
       });
-      
+
       const cartItem = await storage.addToCart(data);
       res.json(cartItem);
     } catch (error) {
@@ -212,17 +212,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const { quantity } = req.body;
-      
+
       if (!quantity || quantity < 1) {
         return res.status(400).json({ message: "Invalid quantity" });
       }
-      
+
       const cartItem = await storage.updateCartItem(id, quantity);
-      
+
       if (!cartItem) {
         return res.status(404).json({ message: "Cart item not found" });
       }
-      
+
       res.json(cartItem);
     } catch (error) {
       res.status(500).json({ message: "Failed to update cart item" });
@@ -233,11 +233,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.removeFromCart(id);
-      
+
       if (!success) {
         return res.status(404).json({ message: "Cart item not found" });
       }
-      
+
       res.json({ message: "Item removed from cart" });
     } catch (error) {
       res.status(500).json({ message: "Failed to remove cart item" });
@@ -289,11 +289,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.removeFromWishlist(id);
-      
+
       if (!success) {
         return res.status(404).json({ message: "Wishlist item not found" });
       }
-      
+
       res.json({ message: "Item removed from wishlist" });
     } catch (error) {
       res.status(500).json({ message: "Failed to remove wishlist item" });
@@ -318,11 +318,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const order = await storage.getOrder(id);
-      
+
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-      
+
       res.json(order);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch order" });
@@ -336,15 +336,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       const { orderData, items } = req.body;
-      
+
       const orderInsert = insertOrderSchema.parse({ ...orderData, userId: userId.toString() });
       const orderItems = items.map((item: any) => insertOrderItemSchema.parse(item));
-      
+
       const order = await storage.createOrder(orderInsert, orderItems);
-      
+
       // Clear cart after successful order
       await storage.clearCart(parseInt(userId.toString()));
-      
+
       res.json(order);
     } catch (error) {
       console.error("Create order error:", error);
@@ -356,17 +356,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
-      
+
       if (!status) {
         return res.status(400).json({ message: "Status is required" });
       }
-      
+
       const order = await storage.updateOrderStatus(id, status);
-      
+
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-      
+
       res.json(order);
     } catch (error) {
       res.status(500).json({ message: "Failed to update order status" });
@@ -377,14 +377,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/payments/process", isAuthenticated, async (req, res) => {
     try {
       const { amount, paymentMethod, orderId } = req.body;
-      
+
       if (!amount || !paymentMethod) {
         return res.status(400).json({ message: "Amount and payment method are required" });
       }
-      
+
       // Simulate payment processing
       const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-      
+
       // In a real app, you would integrate with actual payment gateways like Razorpay, Stripe, etc.
       const paymentResult = {
         transactionId,
@@ -393,7 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentMethod,
         timestamp: new Date().toISOString()
       };
-      
+
       res.json(paymentResult);
     } catch (error) {
       console.error("Payment processing error:", error);

@@ -4,19 +4,19 @@ import { motion } from "framer-motion";
 
 export default function Footer() {
   const quickLinks = [
-    { href: "/", label: "About Us" },
-    { href: "/", label: "Contact Us" },
-    { href: "/", label: "Careers" },
-    { href: "/", label: "Press" },
-    { href: "/", label: "Blog" },
+    { href: "/about", label: "About Us" },
+    { href: "/contact", label: "Contact Us" },
+    { href: "/careers", label: "Careers" },
+    { href: "/press", label: "Press" },
+    { href: "/blog", label: "Blog" },
   ];
 
   const customerService = [
-    { href: "/", label: "Help Center" },
+    { href: "/help", label: "Help Center" },
     { href: "/orders", label: "Track Your Order" },
-    { href: "/", label: "Returns & Exchanges" },
-    { href: "/", label: "Shipping Info" },
-    { href: "/", label: "Size Guide" },
+    { href: "/returns", label: "Returns & Exchanges" },
+    { href: "/shipping", label: "Shipping Info" },
+    { href: "/size-guide", label: "Size Guide" },
   ];
 
   const socialLinks = [
@@ -85,10 +85,8 @@ export default function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href}>
-                    <a className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
+                  <Link href={link.href} className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
                       {link.label}
-                    </a>
                   </Link>
                 </li>
               ))}
@@ -106,10 +104,8 @@ export default function Footer() {
             <ul className="space-y-3">
               {customerService.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href}>
-                    <a className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
-                      {link.label}
-                    </a>
+                  <Link href={link.href} className="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
+                    {link.label}
                   </Link>
                 </li>
               ))}
