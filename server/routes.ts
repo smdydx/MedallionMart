@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertCartItemSchema.parse({ 
         productId: parseInt(productId), 
         quantity: parseInt(quantity), 
-        userId: parseInt(userId) 
+        userId: userId 
       });
       
       const cartItem = await storage.addToCart(data);

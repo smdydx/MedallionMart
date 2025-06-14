@@ -37,26 +37,53 @@ const statusConfig = {
 };
 
 function OrderTrackingModal({ order }: { order: any }) {
+  const getStatusIndex = (status: string) => {
+    const statusOrder = ["confirmed", "preparing", "packed", "out_for_delivery", "delivered"];
+    return statusOrder.indexOf(status);
+  };
+
+  const currentStatusIndex = getStatusIndex(order.status);
+
   const trackingSteps = [
     {
       status: "confirmed",
+      label: "Order Confirmed",
+      description: "Your order has been confirmed and payment received",
       time: "12:45 PM",
-      completed: true
+      completed: currentStatusIndex >= 0,
+      icon: "✓"
     },
     {
       status: "preparing",
-      time: "12:47 PM",
-      completed: order.status !== "confirmed"
+      label: "Preparing Order",
+      description: "Your items are being picked and packed",
+      time: currentStatusIndex >= 1 ? "12:47 PM" : "",
+      completed: currentStatusIndex >= 1,
+      icon: "📦"
+    },
+    {
+      status: "packed",
+      label: "Order Packed",
+      description: "Your order is packed and ready for dispatch",
+      time: currentStatusIndex >= 2 ? "12:50 PM" : "",
+      completed: currentStatusIndex >= 2,
+      icon: "📋"
     },
     {
       status: "out_for_delivery",
-      time: order.status === "out_for_delivery" || order.status === "delivered" ? "12:52 PM" : "",
-      completed: order.status === "out_for_delivery" || order.status === "delivered"
+      label: "Out for Delivery",
+      description: "Your order is on the way to your location",
+      time: currentStatusIndex >= 3 ? "12:52 PM" : "",
+      completed: currentStatusIndex >= 3,
+      icon: "🚚"
     },
     {
       status: "delivered",
-      time: order.status === "delivered" ? "1:05 PM" : "",
-      completed: order.status === "delivered"
+      label: "Delivered",
+      description: "Your order has been successfully delivered",
+      time: currentStatusIndex >= 4 ? "1:05 PM" : "",
+      completed: currentStatusIndex >= 4,
+      icon: "🎉"
     }
   ];
 
@@ -77,34 +104,49 @@ function OrderTrackingModal({ order }: { order: any }) {
 
         {/* Tracking Steps */}
         <div className="space-y-4">
-          {trackingSteps.map((step, index) => {
-            const config = statusConfig[step.status as keyof typeof statusConfig];
-            const IconComponent = config.icon;
-            
-            return (
-              <motion.div
-                key={step.status}
-                className="flex items-center space-x-4"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step.completed ? config.color : 'bg-gray-100 text-gray-400'
-                } ${step.status === order.status ? 'animate-pulse' : ''}`}>
-                  <IconComponent className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
+          {trackingSteps.map((step, index) => (
+            <motion.div
+              key={step.status}
+              className="flex items-center space-x-4 relative"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              {/* Connection Line */}
+              {index < trackingSteps.length - 1 && (
+                <div className="absolute left-5 top-10 w-0.5 h-8 bg-gray-200"></div>
+              )}
+              
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg z-10 ${
+                step.completed 
+                  ? 'bg-green-500 text-white' 
+                  : step.status === order.status 
+                    ? 'bg-blue-500 text-white animate-pulse' 
+                    : 'bg-gray-200 text-gray-400'
+              }`}>
+                {step.icon}
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
                   <h4 className={`font-semibold ${step.completed ? 'text-gray-900' : 'text-gray-500'}`}>
-                    {config.label}
+                    {step.label}
                   </h4>
-                  <p className="text-sm text-gray-600">
-                    {step.time && `${step.time} - `}{config.description}
-                  </p>
+                  {step.time && (
+                    <span className="text-sm text-gray-500">{step.time}</span>
+                  )}
                 </div>
-              </motion.div>
-            );
-          })}
+                <p className="text-sm text-gray-600">{step.description}</p>
+                {step.status === order.status && !step.completed && (
+                  <div className="mt-1">
+                    <div className="w-24 h-1 bg-blue-200 rounded">
+                      <div className="h-1 bg-blue-500 rounded animate-pulse" style={{ width: '60%' }}></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Delivery Address */}

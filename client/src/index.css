@@ -194,15 +194,15 @@
   --chart-5: 340 75% 55%;
 }
 
-  /* Sidebar colors */
-  --sidebar-background: 0 0% 98%; /* #fafafa */
-  --sidebar-foreground: 240 5% 26%; /* #3f3f46 */
-  --sidebar-primary: 24 95% 53%; /* #f97316 */
-  --sidebar-primary-foreground: 60 9% 98%; /* #fefce8 */
-  --sidebar-accent: 220 14% 96%; /* #f1f5f9 */
-  --sidebar-accent-foreground: 220 9% 46%; /* #475569 */
-  --sidebar-border: 220 13% 91%; /* #e2e8f0 */
-  --sidebar-ring: 24 95% 53%; /* #f97316 */
+.sidebar {
+    --sidebar-background: 0 0% 98%; /* #fafafa */
+    --sidebar-foreground: 240 5.3% 26.1%; /* #374151 */
+    --sidebar-primary: 24 95% 53%; /* #f97316 */
+    --sidebar-primary-foreground: 60 9% 98%; /* #fefce8 */
+    --sidebar-accent: 24 95% 53%; /* #f97316 */
+    --sidebar-accent-foreground: 60 9% 98%; /* #fefce8 */
+    --sidebar-border: 220 13% 91%; /* #e2e8f0 */
+    --sidebar-ring: 24 95% 53%; /* #f97316 */
 }
 
 .dark {

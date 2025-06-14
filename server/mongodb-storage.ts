@@ -45,6 +45,8 @@ export class MongoStorage implements IStorage {
       { name: "Sports", icon: "fas fa-dumbbell", color: "yellow", description: "Sports and fitness equipment" },
       { name: "Books", icon: "fas fa-book", color: "purple", description: "Books and educational materials" },
       { name: "Grocery", icon: "fas fa-apple-alt", color: "pink", description: "Fresh groceries and food items" },
+      { name: "Beauty", icon: "fas fa-spa", color: "orange", description: "Beauty and personal care products" },
+      { name: "Automotive", icon: "fas fa-car", color: "indigo", description: "Car accessories and automotive parts" },
     ];
 
     const insertedCategories = await this.db.collection('categories').insertMany(categoriesData);
@@ -657,7 +659,10 @@ export class MongoStorage implements IStorage {
     const orderData = {
       ...insertOrder,
       createdAt: new Date(),
-      status: insertOrder.status || "confirmed"
+      status: insertOrder.status || "confirmed",
+      paymentMethod: insertOrder.paymentMethod || "cash",
+      transactionId: insertOrder.transactionId || null,
+      trackingId: `TRK${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`
     };
 
     const orderResult = await this.db.collection('orders').insertOne(orderData);

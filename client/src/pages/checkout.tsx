@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/footer";
+import PaymentModal from "@/components/payment-modal";
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
@@ -30,6 +31,7 @@ export default function Checkout() {
 
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const { data: cartItems, isLoading } = useQuery({
     queryKey: ['/api/cart'],
@@ -201,7 +203,7 @@ export default function Checkout() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="address">Address</Label>
                     <Textarea
@@ -212,7 +214,7 @@ export default function Checkout() {
                       rows={3}
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="city">City</Label>
@@ -299,7 +301,7 @@ export default function Checkout() {
                       </div>
                       <span className="text-green-600 font-semibold">Recommended</span>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2 p-3 border rounded-lg opacity-50">
                       <RadioGroupItem value="card" id="card" disabled />
                       <div className="flex-1">
@@ -307,7 +309,7 @@ export default function Checkout() {
                         <p className="text-sm text-gray-600">Coming soon</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2 p-3 border rounded-lg opacity-50">
                       <RadioGroupItem value="upi" id="upi" disabled />
                       <div className="flex-1">
@@ -361,7 +363,7 @@ export default function Checkout() {
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery Fee</span>
                     <span className="font-semibold">
